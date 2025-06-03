@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <ctime>
+#include <string> // For string operations (added for dashboard helper)
 
 int main() {
     // Initialize reactor variables
@@ -13,6 +14,26 @@ int main() {
     double fuel = 100.0;             // fuel level (%), new variable
     bool running = true;             // reactor operational status
 
+    // Helper function to print a horizontal bar for any stat (added for dashboard)
+    auto printBar = [](const std::string& label, double value, double max, int width = 20) {
+        int bars = static_cast<int>((value / max) * width);
+        std::cout << std::left << std::setw(8) << label << "[";
+        for (int i = 0; i < width; ++i) {
+            if (i < bars)
+                std::cout << "█";
+            else
+                std::cout << " ";
+        }
+        std::cout << "]  ";
+        if (label == "Temp")
+            std::cout << std::fixed << std::setprecision(1) << value << "°C";
+        else if (label == "Coolant" || label == "Fuel")
+            std::cout << std::fixed << std::setprecision(1) << value << "%";
+        else
+            std::cout << std::fixed << std::setprecision(1) << value;
+        std::cout << std::endl;
+    };
+
     std::srand(std::time(nullptr)); // Seed random number generator for random events
 
     std::cout << "Welcome to the C++ Nuclear Reactor Simulator v0.1\n";
@@ -20,6 +41,13 @@ int main() {
 
     // Main simulation loop: runs each tick while reactor is operational
     while (running) {
+        // === ASCII Dashboard === (added)
+        std::cout << "\n=== Reactor Dashboard ===\n";
+        printBar("Temp", temperature, 2000.0);      // Assume 2000°C is max for bar
+        printBar("Coolant", coolant, 100.0);
+        printBar("Fuel", fuel, 100.0);
+        std::cout << std::endl;
+
         // Show current reactor state with formatted output
         std::cout << "\nNeutrons: " << std::fixed << std::setprecision(2) << neutrons
                   << " | Control Rods: " << (int)(controlRods * 100) << "% in"
